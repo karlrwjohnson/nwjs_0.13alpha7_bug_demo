@@ -1,0 +1,12 @@
+{
+  "name": "nwjs_0.13alpha7_bug_demo",
+  "main": "index.htm",
+  "window": {
+    "width": 800,
+    "height": 600
+  },
+  "chromium-args": "--javascript-harmony",
+
+  "description": "A demonstration of a bug in NW.js version 0.13alpha7. See Readme.md for details"
+}
+

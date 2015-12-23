@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+</head>
+<body>
+    <h1>Look at the dev tools</h1>
+</body>
+<script>
+    'use strict';
+
+    // Show the dev tools (aside: why is this so hard again?)
+    nw.Window.get().showDevTools()
+
+    // Patch the NodeJS context so it can log to the NW console.
+    // (This is probably related to the issue I'm trying to demonstrate --
+    // if the NodeJS context doesn't know about the NW console, it's
+    // probably trying to log errors to the wrong place!)
+    nw.require('./globalsWorkaround')(window);
+
+    // Define a generic logging function
+    function myCallback(thing) {
+        console.log('  myCallback: Got ' + thing);
+    }
+
+    // Load in functions defined in the NodeJS context.
+    // Each one is identical to its counterpart below:
+    // Given a callback function, call it asynchonously after 1 second.
+    // The ok() function is valid, but bad() references an undefined symbol,
+    // which is a run-time error.
+    const ok = nw.require('./ok');
+    const bad = nw.require('./bad');
+
+    function ok_local(callback) {
+        console.log('ok_local(): Going to call callback in 1 second');
+        setTimeout(function() {
+            console.log('ok_local(): About to call callback');
+            callback('OKAY_LOCAL');
+            console.log('ok_local(): Called callback');
+        }, 1000);
+    };
+
+    function bad_local(callback) {
+        console.log('bad_local(): Going to call callback in 1 second');
+        setTimeout(function() {
+            console.log('bad_local(): About to call callback');
+            callback(UNDEFINED_SYMBOL);
+            console.log('bad_local(): Called callback');
+        }, 1000);
+    };
+
+    // Call each function in turn. The initial calls will all succeed
+    // regardless of whether the async portion fails.
+    ok(myCallback);
+    bad(myCallback);
+    ok_local(myCallback);
+    bad_local(myCallback);
+</script>
+</html>
+
